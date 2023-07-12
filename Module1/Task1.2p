@@ -1,0 +1,60 @@
+const int LED_PIN = LED_BUILTIN;
+const int TEMP_SENSOR_PIN = A0;
+const int BUTTON_PIN = 2;
+
+void setup()
+{
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(TEMP_SENSOR_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  Serial.begin(9600);
+
+  //declare interupt
+  attachInterrupt(TEMP_SENSOR_PIN, temperatureREAD, RISING);
+  
+}
+
+void loop()
+{
+  // checks button status
+  if (digitalRead(BUTTON_PIN) == LOW)
+  {
+    Serial.print("button pressed"); //printed for testing reason
+    Serial.println();
+    temperatureREAD();
+    delay(50);
+  }
+  
+}
+
+void temperatureREAD()
+{
+  int temperature = analogRead(TEMP_SENSOR_PIN);
+  
+  //used chatGPT to help convert the voltage from the
+  //temp sensor into a celcius reading
+  float voltage = temperature * 5.0 / 1023.0;
+  float temperatureC = (voltage - 0.5) * 100.0; 
+  temperatureC += random(-17, 3); //to add randomness to the value
+
+  Serial.print("temperature celcius: ");
+  Serial.print(temperatureC);
+  Serial.println();
+  
+  if (temperatureC > 15.0)
+  {
+    digitalWrite(LED_PIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_PIN, LOW);
+    delay(500);
+  }
+  
+  else
+  {
+    digitalWrite(LED_PIN, LOW);
+    delay(5000);
+  }
+  
+}
+
